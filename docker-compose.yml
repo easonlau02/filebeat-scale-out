@@ -1,0 +1,37 @@
+version: '2'
+services:
+  configuredata:
+    labels:
+      io.rancher.container.pull_image: always
+    image: eason02/filebeat-data-volume:latest
+    volumes:
+      - /etc/filebeat
+    command:
+      - tail
+      - -f
+      - /etc/filebeat/default/filebeat.yml
+  filebeat:
+    image: eason02/filebeat:5.3.1
+    container_name: filebeat-5.3.1
+    restart: always
+    labels:
+      io.rancher.scheduler.global: 'true'
+      io.rancher.sidekicks: configuredata
+      io.rancher.container.pull_image: always
+    environment:
+      - env=QA
+      - logstash=localhost
+      - config=default
+      - applog_folder=/home/filebeat/logs
+    network_mode: host
+    volumes_from:
+      - configuredata
+    volumes:
+      - /var/lib/filebeat/:/etc/filebeat/data
+      - /var/log/nginx/:/var/log/nginx/
+      - /home/filebeat/logs:/home/filebeat/logs
+    logging:
+      driver: json-file
+      options:
+        max-file: '5'
+        max-size: 10m
