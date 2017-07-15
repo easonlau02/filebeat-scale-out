@@ -1,0 +1,11 @@
+FROM eason02/busybox:latest
+
+MAINTAINER Eason Lau <eason.lau02@hotmail.com>
+
+
+# filebeat
+RUN mkdir -p /etc/filebeat
+
+COPY ./config/ /etc/filebeat/
+
+RUN ls -R /etc/filebeat/
